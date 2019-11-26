@@ -1,0 +1,90 @@
+spring:
+  application:
+    name: custom-gateway
+   #配置数据源
+#    datasource:
+#      url:  jdbc:mysql://127.0.0.1:3306/centerim_avatar?autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=true
+#      username: root
+#      password:  Xituan@123
+#      driver-class-name: com.mysql.cj.jdbc.Driver
+#  #    driver-class-name: com.mysql.jdbc.Driver
+#      type: com.alibaba.druid.pool.DruidDataSource
+#      initialSize: 3
+#      minIdle: 2
+#      maxActive: 5
+#      maxWait: 60000
+#      timeBetweenEvictionRunsMillis: 60000
+#      minEvictableIdleTimeMillis: 30000
+#      testWhileIdle: true
+#      testOnBorrow: false
+#      #exceptionSorter: true
+#      testOnReturn: false
+#      poolPreparedStatements: true
+#      filters: stat #,wall,sl4j
+#      maxPoolPreparedStatementPerConnectionSize: 20
+#      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+#      useGlobalDataSourceStat: true
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss
+  redis:
+    port: 6379
+    host: 127.0.0.1
+#    password: 123456
+    jedis:
+      pool:
+        max-active: 1000
+        min-idle: 5
+        max-wait: 6000
+        max-idle: 18
+  cache:
+    type: caffeine
+    caffeine:
+      spec: initialCapacity=10,maximumSize=2000,expireAfterWrite=3000s
+server:
+  port: 1012
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:1001/eureka/
+  instance:
+    prefer-ip-address: true
+    lease-expiration-duration-in-seconds: 10
+    lease-renewal-interval-in-seconds: 5
+
+feign:
+  httpclient:
+    enabled: true
+  hystrix:
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    shutdown:
+      enabled: false
+  server:
+    port: 1012
+mybatis-plus:
+  #信息输出设置
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+nacos:
+  config:
+    server-addr: 127.0.0.1:8848
+routeCache:
+  enable: true
+  balance: false
+
+
+pagehelper:
+  reasonable: false # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
+  support-methods-arguments: true
+  params: count=countSql
+  row-bounds-with-count: true
+  helper-dialect: mysql
