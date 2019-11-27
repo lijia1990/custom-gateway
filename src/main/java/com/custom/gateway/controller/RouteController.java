@@ -1,6 +1,7 @@
 package com.custom.gateway.controller;
 
 import com.custom.gateway.config.AssembleRouteDefinition;
+import com.custom.gateway.config.annotation.CacheClean;
 import com.custom.gateway.config.route.definition.GatewayRouteDefinition;
 import com.custom.gateway.model.core.BaseAdvice;
 import com.custom.gateway.model.core.ResponseBodyEntity;
@@ -54,5 +55,11 @@ public class RouteController extends BaseAdvice {
         service.clean();
         dynamicRouteService.refreshRoute();
         return Mono.just(ResponseBodyEntity.success());
+    }
+
+    @GetMapping("/test")
+    @CacheClean
+    public Mono<Integer> test() {
+        return Mono.just(200);
     }
 }

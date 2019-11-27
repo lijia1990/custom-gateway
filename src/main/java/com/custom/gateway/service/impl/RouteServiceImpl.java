@@ -2,6 +2,7 @@ package com.custom.gateway.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.custom.gateway.config.AssembleRouteDefinition;
+import com.custom.gateway.config.annotation.CacheClean;
 import com.custom.gateway.dao.RouteMapper;
 import com.custom.gateway.model.core.PageBean;
 import com.custom.gateway.model.form.XtRouteQueryForm;
@@ -36,12 +37,14 @@ public class RouteServiceImpl implements RouteService {
 
 
     @Override
+    @CacheClean
     @CachePut(value = "xtRoute", key = "#po.id")
     public void save(RoutePo po) {
         dao.insert(po);
     }
 
     @Override
+    @CacheClean
     @CacheEvict(value = "xtRoute", key = "#id")
     public void delete(Long id) {
         RoutePo po = new RoutePo(id, true);
@@ -49,6 +52,7 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
+    @CacheClean
     @CacheEvict(value = "xtRoute", key = "#po.id")
     public void update(RoutePo po) {
         dao.updateById(po);

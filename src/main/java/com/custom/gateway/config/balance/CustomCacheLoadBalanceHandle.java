@@ -2,6 +2,7 @@ package com.custom.gateway.config.balance;
 
 import com.alibaba.fastjson.JSONArray;
 import com.custom.gateway.config.CustomACAware;
+import com.custom.gateway.config.exception.BadRequestException;
 import com.custom.gateway.model.core.ResponseBodyEntity;
 import com.netflix.loadbalancer.DynamicServerListLoadBalancer;
 import com.netflix.loadbalancer.ILoadBalancer;
@@ -17,10 +18,13 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.custom.gateway.config.CustomACAware.getBean;
 
@@ -57,7 +61,11 @@ public class CustomCacheLoadBalanceHandle {
     public Boolean handle(ServerList<DiscoveryEnabledServer> list) {
         Boolean resultFlag = true;
         for (DiscoveryEnabledServer server : list.getUpdatedListOfServers()) {
-            resultFlag = handle(server);
+            try {
+                resultFlag = handle(server);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
             if (!resultFlag) {
                 return resultFlag;
             }
@@ -66,16 +74,12 @@ public class CustomCacheLoadBalanceHandle {
     }
 
     @Async
-    @Retryable(value = RuntimeException.class, maxAttempts = 4, backoff = @Backoff(delay = 1000 * 2, multiplier = 1.5))
-    public Boolean handle(DiscoveryEnabledServer server) {
-        WebClient client = WebClient.create(String.format("http://%s/", server.getHostPort()));
-        Mono<ResponseBodyEntity> result = client.get()
-                .uri("gateway/route/clean")
-                .accept(MediaType.APPLICATION_JSON).retrieve()
-                .bodyToMono(ResponseBodyEntity.class);
-        if (!result.block().getCode().equals(200)) {
-            log.error("bad remote request server:{} error:{}", server.getHostPort(), JSONArray.toJSONString(result));
-            return false;
+    @Retryable(value = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 1000 * 2, multiplier = 1.5))
+    public Boolean handle(DiscoveryEnabledServer server) throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, Object> resultMap = restTemplate.getForObject(String.format("http://%s/gateway/route/clean", server.getHostPort()), Map.class);
+        if (!(Boolean) resultMap.get("success")) {
+            throw new BadRequestException(String.format("bad request:%s", JSONArray.toJSONString(resultMap)));
         }
         return true;
     }
