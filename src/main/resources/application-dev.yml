@@ -1,29 +1,6 @@
 spring:
   application:
     name: custom-gateway
-   #配置数据源
-#    datasource:
-#      url:  jdbc:mysql://127.0.0.1:3306/centerim_avatar?autoReconnect=true&zeroDateTimeBehavior=convertToNull&useSSL=true
-#      username: root
-#      password:  Xituan@123
-#      driver-class-name: com.mysql.cj.jdbc.Driver
-#  #    driver-class-name: com.mysql.jdbc.Driver
-#      type: com.alibaba.druid.pool.DruidDataSource
-#      initialSize: 3
-#      minIdle: 2
-#      maxActive: 5
-#      maxWait: 60000
-#      timeBetweenEvictionRunsMillis: 60000
-#      minEvictableIdleTimeMillis: 30000
-#      testWhileIdle: true
-#      testOnBorrow: false
-#      #exceptionSorter: true
-#      testOnReturn: false
-#      poolPreparedStatements: true
-#      filters: stat #,wall,sl4j
-#      maxPoolPreparedStatementPerConnectionSize: 20
-#      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
-#      useGlobalDataSourceStat: true
   mvc:
     date-format: yyyy-MM-dd HH:mm:ss
   redis:
@@ -80,7 +57,8 @@ nacos:
 routeCache:
   enable: true
   balance: false
-
+limit:
+  enable: true
 
 pagehelper:
   reasonable: false # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
