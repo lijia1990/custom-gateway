@@ -16,7 +16,7 @@ spring:
   cache:
     type: caffeine
     caffeine:
-      spec: initialCapacity=10,maximumSize=2000,expireAfterWrite=3000s
+      spec: initialCapacity=10,maximumSize=2000,expireAfterWrite=600s
 server:
   port: 1012
 
@@ -39,7 +39,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: 'service-registry'
   endpoint:
     health:
       show-details: always

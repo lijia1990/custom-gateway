@@ -4,10 +4,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.sun.jmx.snmp.Timestamp;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+
+import java.util.Date;
 
 @Data
 @Accessors(chain = true)
@@ -57,4 +60,11 @@ public class RoutePo {
 
     private Boolean isDel;
 
+    private Date createTime;
+
+    private Date updateTime;
+
+    private String createId;
+
+    private String updateId;
 }

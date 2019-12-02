@@ -14,8 +14,6 @@ import javax.sql.DataSource;
  */
 @Configuration
 public class DruidConfiguration {
-
-
     private static final String DB_PREFIX = "spring.datasource";
 
     @ConfigurationProperties(prefix = DB_PREFIX)

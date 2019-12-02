@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import static com.custom.gateway.config.AssembleRouteDefinition.instanceInfoToXtRouteVOFunc;
 
 @Service
-@CacheConfig(cacheNames = "xtRoute")
+@CacheConfig(cacheNames = "routeList")
 @Transactional(rollbackFor = RuntimeException.class)
 @Import(AssembleRouteDefinition.class)
 public class RouteServiceImpl implements RouteService {
@@ -37,50 +37,47 @@ public class RouteServiceImpl implements RouteService {
 
 
     @Override
-    @CacheClean
-    @CachePut(value = "xtRoute", key = "#po.id")
+    @CacheClean("routeList")
     public void save(RoutePo po) {
         dao.insert(po);
     }
 
     @Override
-    @CacheClean
-    @CacheEvict(value = "xtRoute", key = "#id")
+    @CacheClean("routeList")
     public void delete(Long id) {
-        RoutePo po = new RoutePo(id, true);
-        dao.updateById(po);
+        dao.updateById(new RoutePo(id, true));
     }
 
     @Override
-    @CacheClean
-    @CacheEvict(value = "xtRoute", key = "#po.id")
+    @CacheClean("routeList")
     public void update(RoutePo po) {
         dao.updateById(po);
     }
 
     @Override
-    @Cacheable(key = "#id")
-    public RoutePo findById(Long id) {
-        return null;
+    @Cacheable(value = "RouteList", key = "#id")
+    public Mono<RouteVo> findById(Long id) {
+        return Mono.just(dao.selectById(id)).map(instanceInfoToXtRouteVOFunc);
     }
 
     @Override
     @Cacheable(value = "RouteList")
     public List<RouteVo> queryList() {
-        return  dao.selectList(null).stream().map(instanceInfoToXtRouteVOFunc).collect(Collectors.toList());
+        return dao.selectList(new QueryWrapper<RoutePo>()
+                .eq("is_del", 0)).stream().map(instanceInfoToXtRouteVOFunc).collect(Collectors.toList());
     }
 
     @Override
     public Mono<PageBean<RouteVo>> queryForList(XtRouteQueryForm form) {
         PageHelper.startPage(form.getPageNo(), form.getPageSize());
         List<RoutePo> list = dao.selectList(new QueryWrapper<RoutePo>()
-                .eq("gender", 0));
+                .eq("is_del", 0));
         return Mono.just(new PageBean(list.stream().map(instanceInfoToXtRouteVOFunc).collect(Collectors.toList())));
     }
 
     @Override
     @CacheEvict(value = "RouteList", allEntries = true)
-    public void clean() {
+    public void clean(String value) {
 
     }
 }

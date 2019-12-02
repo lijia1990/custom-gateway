@@ -2,8 +2,10 @@ package com.custom.gateway.controller;
 
 import com.custom.gateway.config.AssembleRouteDefinition;
 import com.custom.gateway.config.annotation.CacheClean;
+import com.custom.gateway.config.annotation.CustomRestController;
 import com.custom.gateway.config.route.definition.GatewayRouteDefinition;
 import com.custom.gateway.model.core.BaseAdvice;
+import com.custom.gateway.model.core.PageBean;
 import com.custom.gateway.model.core.ResponseBodyEntity;
 import com.custom.gateway.model.form.XtRouteQueryForm;
 import com.custom.gateway.model.vo.RouteVo;
@@ -16,8 +18,7 @@ import reactor.core.publisher.Mono;
 
 import static com.custom.gateway.config.AssembleRouteDefinition.assembleRouteDefinition;
 
-@RestController
-@RequestMapping("/gateway/route")
+@CustomRestController("/gateway/route")
 @Import(AssembleRouteDefinition.class)
 public class RouteController extends BaseAdvice {
 
@@ -33,7 +34,7 @@ public class RouteController extends BaseAdvice {
         return Mono.just(ResponseBodyEntity.success());
     }
 
-    @GetMapping("/routes/{id}")
+    @GetMapping("/delete/{id}")
     public Mono<ResponseBodyEntity<String>> delete(@PathVariable String id) {
         this.dynamicRouteService.delete(id);
         return Mono.just(ResponseBodyEntity.success());
@@ -46,13 +47,18 @@ public class RouteController extends BaseAdvice {
     }
 
     @PostMapping("queryForList")
-    public Mono<ResponseBodyEntity<RouteVo>> find(@RequestBody XtRouteQueryForm form) {
-        return  service.queryForList(form).map(ResponseBodyEntity::success);
+    public Mono<ResponseBodyEntity<PageBean<RouteVo>>> queryForList(@RequestBody XtRouteQueryForm form) {
+        return service.queryForList(form).map(ResponseBodyEntity::success);
+    }
+
+    @GetMapping("/find/{id}")
+    public Mono<ResponseBodyEntity<PageBean<RouteVo>>> find(@PathVariable Long id) {
+        return service.findById(id).map(ResponseBodyEntity::success);
     }
 
     @GetMapping("clean")
-    public Mono<ResponseBodyEntity<String>> clean() {
-        service.clean();
+    public Mono<ResponseBodyEntity<String>> clean(String value) {
+        service.clean(value);
         dynamicRouteService.refreshRoute();
         return Mono.just(ResponseBodyEntity.success());
     }

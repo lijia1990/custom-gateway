@@ -16,11 +16,11 @@ public interface RouteService {
 
     void update(RoutePo po);
 
-    RoutePo findById(Long id);
+    Mono<RouteVo> findById(Long id);
 
     List<RouteVo> queryList();
 
     Mono<PageBean<RouteVo>> queryForList(XtRouteQueryForm form);
 
-    void clean();
+    void clean(String value);
 }
