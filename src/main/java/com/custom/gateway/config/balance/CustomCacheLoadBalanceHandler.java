@@ -33,7 +33,7 @@ import static com.custom.gateway.config.CustomACAware.getBean;
 @Log4j2
 @Import(CustomACAware.class)
 @Component
-public class CustomCacheLoadBalanceHandle {
+public class CustomCacheLoadBalanceHandler {
     @Value("${spring.application.name}")
     private String SERVER_NAME;
 

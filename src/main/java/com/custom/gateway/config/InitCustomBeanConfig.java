@@ -1,6 +1,7 @@
 package com.custom.gateway.config;
 
 import com.custom.gateway.config.redis.CustomRedisScript;
+import com.custom.gateway.service.CurrentLimitingGlobalService;
 import com.custom.gateway.service.CurrentLimitingService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -34,8 +35,8 @@ public class InitCustomBeanConfig {
     @ConditionalOnMissingBean
     public CustomCurrentLimiting getTool(@Qualifier(REDIS_SCRIPT_BEAN) RedisScript<List<Long>> script,
                                          ReactiveRedisTemplate<String, String> redisTemplate,
-                                         CurrentLimitingService service) {
-        return new CustomCurrentLimiting(script, redisTemplate, service);
+                                         CurrentLimitingService service,CurrentLimitingGlobalService globalService) {
+        return new CustomCurrentLimiting(script, redisTemplate, service,globalService);
 
     }
 }

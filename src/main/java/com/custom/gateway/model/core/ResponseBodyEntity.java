@@ -47,6 +47,9 @@ public class ResponseBodyEntity<T> {
     public static ResponseBodyEntity initFail() {
         return new ResponseBodyEntity(HttpStatus.BAD_REQUEST, false);
     }
+    public static ResponseBodyEntity initFail(Object data) {
+        return new ResponseBodyEntity(HttpStatus.BAD_REQUEST, false);
+    }
 
 
 }

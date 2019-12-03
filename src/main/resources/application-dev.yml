@@ -56,8 +56,8 @@ nacos:
     server-addr: 127.0.0.1:8848
 routeCache:
   enable: true
-  balance: false
-limit:
+  balance: true
+limiting:
   enable: true
 
 pagehelper:

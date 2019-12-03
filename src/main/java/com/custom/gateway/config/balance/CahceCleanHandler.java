@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Aspect
 @Configuration
-public class CahceCleanHandle {
+public class CahceCleanHandler {
     @Autowired
-    private CustomCacheLoadBalanceHandle customerCacheLoadBalanceHandle;
+    private CustomCacheLoadBalanceHandler customerCacheLoadBalanceHandle;
 
     @Pointcut(value = "@annotation(com.custom.gateway.config.annotation.CacheClean)")
     public void excudeService() {
