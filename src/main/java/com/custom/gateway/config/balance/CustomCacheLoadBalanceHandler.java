@@ -3,7 +3,6 @@ package com.custom.gateway.config.balance;
 import com.alibaba.fastjson.JSONArray;
 import com.custom.gateway.config.CustomACAware;
 import com.custom.gateway.config.exception.BadRequestException;
-import com.custom.gateway.model.core.ResponseBodyEntity;
 import com.google.common.collect.Maps;
 import com.netflix.loadbalancer.DynamicServerListLoadBalancer;
 import com.netflix.loadbalancer.ILoadBalancer;
@@ -14,14 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.ribbon.SpringClientFactory;
 import org.springframework.cloud.netflix.ribbon.eureka.DomainExtractingServerList;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -35,14 +31,14 @@ import static com.custom.gateway.config.CustomACAware.getBean;
 @Component
 public class CustomCacheLoadBalanceHandler {
     @Value("${spring.application.name}")
-    private String SERVER_NAME;
+    private String serverName;
 
     public Boolean handle(String key) {
         return handle(getBean(SpringClientFactory.class), key);
     }
 
     public Boolean handle(SpringClientFactory factory, String key) {
-        ILoadBalancer loadBalancer = factory.getLoadBalancer(SERVER_NAME);
+        ILoadBalancer loadBalancer = factory.getLoadBalancer(serverName);
         return handle((DynamicServerListLoadBalancer) loadBalancer, key);
     }
 
@@ -77,8 +73,8 @@ public class CustomCacheLoadBalanceHandler {
     }
 
     @Async
-    @Retryable(value = Exception.class, maxAttempts = 4, backoff = @Backoff(delay = 1000 * 2, multiplier = 1.5))
-    public Boolean handle(DiscoveryEnabledServer server, HashMap value) throws Exception {
+    @Retryable(value = RuntimeException.class, maxAttempts = 4, backoff = @Backoff(delay = 1000 * 2, multiplier = 1.5))
+    public Boolean handle(DiscoveryEnabledServer server, Map value) {
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> resultMap = restTemplate.getForObject(String.format("http://%s/gateway/route/clean", server.getHostPort()), Map.class, value);
         if (!(Boolean) resultMap.get("success")) {
