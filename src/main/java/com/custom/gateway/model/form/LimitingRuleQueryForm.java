@@ -4,5 +4,5 @@ import com.custom.gateway.model.core.BaseQueryForm;
 import lombok.Data;
 
 @Data
-public class XtRouteQueryForm extends BaseQueryForm {
+public class LimitingRuleQueryForm extends BaseQueryForm {
 }

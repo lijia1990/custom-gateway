@@ -13,9 +13,11 @@ public class LimitingRuleVo {
 
     private Boolean ruleType;
 
-    private String ruleVals;
+    private String ruleVal;
 
     private Long qpsCount;
+
+    private String limitingHz;
 
     private Long limitingStartTime;
 

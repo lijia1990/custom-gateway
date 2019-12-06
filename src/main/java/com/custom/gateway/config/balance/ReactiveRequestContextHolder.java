@@ -7,6 +7,10 @@ public class ReactiveRequestContextHolder {
     static final Class<ServerHttpRequest> CONTEXT_KEY = ServerHttpRequest.class;
     private static final ThreadLocal<String> ip = new ThreadLocal<>();
 
+    ReactiveRequestContextHolder() {
+
+    }
+
     public static void setIp(String id) {
         ip.set(id);
     }

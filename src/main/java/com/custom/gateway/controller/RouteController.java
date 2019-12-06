@@ -7,13 +7,16 @@ import com.custom.gateway.config.route.definition.GatewayRouteDefinition;
 import com.custom.gateway.model.core.BaseAdvice;
 import com.custom.gateway.model.core.PageBean;
 import com.custom.gateway.model.core.ResponseBodyEntity;
-import com.custom.gateway.model.form.XtRouteQueryForm;
+import com.custom.gateway.model.form.RouteQueryForm;
 import com.custom.gateway.model.vo.RouteVo;
 import com.custom.gateway.service.DynamicRouteService;
 import com.custom.gateway.service.RouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
 
 import static com.custom.gateway.config.AssembleRouteDefinition.assembleRouteDefinition;
@@ -47,7 +50,7 @@ public class RouteController extends BaseAdvice {
     }
 
     @PostMapping("queryForList")
-    public Mono<ResponseBodyEntity<PageBean<RouteVo>>> queryForList(@RequestBody XtRouteQueryForm form) {
+    public Mono<ResponseBodyEntity<PageBean<RouteVo>>> queryForList(@RequestBody RouteQueryForm form) {
         return service.queryForList(form).map(ResponseBodyEntity::success);
     }
 

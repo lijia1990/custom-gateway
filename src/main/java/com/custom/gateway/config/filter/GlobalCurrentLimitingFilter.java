@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @AutoConfigureAfter(InitCustomBeanConfig.class)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @ConditionalOnProperty(prefix = "limiting", name = "enable", havingValue = "true")
-public class DefultCurrentLimitingFilter implements WebFilter, Ordered {
+public class GlobalCurrentLimitingFilter implements WebFilter, Ordered {
     @Autowired
     private CustomCurrentLimiting customCurrentLimiting;
 
@@ -31,12 +31,12 @@ public class DefultCurrentLimitingFilter implements WebFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return Mono.just(customCurrentLimiting.isAllowed(exchange.getRequest())).flatMap(data -> filter(exchange, chain, data)
+        return customCurrentLimiting.isAllowed(exchange.getRequest()).flatMap(data -> filter(exchange, chain, data)
         );
     }
 
-    public static Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain, AllowedEntity data) {
-        if (data != null && !data.getCode().equals("0")) {
+    public static Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain, Boolean data) {
+        if (data != null && !data) {
             exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
             return exchange.getResponse().setComplete();
         }

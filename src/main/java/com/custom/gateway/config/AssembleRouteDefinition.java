@@ -3,7 +3,11 @@ package com.custom.gateway.config;
 import com.custom.gateway.config.route.definition.GatewayFilterDefinition;
 import com.custom.gateway.config.route.definition.GatewayPredicateDefinition;
 import com.custom.gateway.config.route.definition.GatewayRouteDefinition;
+import com.custom.gateway.model.po.LimitingRuleGlobalPo;
+import com.custom.gateway.model.po.LimitingRulePo;
 import com.custom.gateway.model.po.RoutePo;
+import com.custom.gateway.model.vo.LimitingRuleGlobalVo;
+import com.custom.gateway.model.vo.LimitingRuleVo;
 import com.custom.gateway.model.vo.RouteVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cloud.gateway.filter.FilterDefinition;
@@ -44,7 +48,7 @@ public class AssembleRouteDefinition {
         }
         definition.setFilters(filters);
 
-        URI uri ;
+        URI uri;
         if (gwdefinition.getUri().startsWith("http")) {
             uri = UriComponentsBuilder.fromHttpUrl(gwdefinition.getUri()).build().toUri();
         } else {
@@ -55,9 +59,19 @@ public class AssembleRouteDefinition {
         return definition;
     }
 
-    public static Function<RoutePo, RouteVo> instanceInfoToXtRouteVOFunc = instance -> {
+    public static Function<RoutePo, RouteVo> instanceInfoToRouteVOFunc = instance -> {
         RouteVo instanceVo = new RouteVo();
-        BeanUtils.copyProperties(instance,instanceVo);
+        BeanUtils.copyProperties(instance, instanceVo);
+        return instanceVo;
+    };
+    public static Function<LimitingRulePo, LimitingRuleVo> instanceInfoToCustomRouteVOFunc = instance -> {
+        LimitingRuleVo instanceVo = new LimitingRuleVo();
+        BeanUtils.copyProperties(instance, instanceVo);
+        return instanceVo;
+    };
+    public static Function<LimitingRuleGlobalPo, LimitingRuleGlobalVo> instanceGlobalInfoToCustomRouteVOFunc = instance -> {
+        LimitingRuleGlobalVo instanceVo = new LimitingRuleGlobalVo();
+        BeanUtils.copyProperties(instance, instanceVo);
         return instanceVo;
     };
 

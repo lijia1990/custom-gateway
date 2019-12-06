@@ -23,9 +23,16 @@ public class ResponseBodyEntity<T> {
         this.message = httpStatus.getReasonPhrase();
         this.success = success;
     }
+
     public ResponseBodyEntity(Exception e) {
         this.code = HttpStatus.BAD_REQUEST.value();
         this.message = e.getMessage();
+        this.success = false;
+    }
+
+    public ResponseBodyEntity(String e) {
+        this.code = HttpStatus.BAD_REQUEST.value();
+        this.message = e;
         this.success = false;
     }
 
@@ -47,6 +54,7 @@ public class ResponseBodyEntity<T> {
     public static ResponseBodyEntity initFail() {
         return new ResponseBodyEntity(HttpStatus.BAD_REQUEST, false);
     }
+
     public static ResponseBodyEntity initFail(Object data) {
         return new ResponseBodyEntity(HttpStatus.BAD_REQUEST, false);
     }

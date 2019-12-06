@@ -10,11 +10,9 @@ import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfig
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.scripting.support.ResourceScriptSource;
-
-import java.util.List;
 
 @Configuration
 @AutoConfigureAfter(RedisReactiveAutoConfiguration.class)
@@ -25,16 +23,15 @@ public class InitCustomBeanConfig {
     public CustomRedisScript redisRequestRateLimiterScript() {
         CustomRedisScript redisScript = new CustomRedisScript<>();
         redisScript.setScriptSource(new ResourceScriptSource(
-                new ClassPathResource("META-INF/scripts/request_current_limiting.lua")));
-        redisScript.setResultType(List.class);
+                new ClassPathResource("script/request-current-limiting.lua")));
+        redisScript.setResultType(Boolean.class);
         return redisScript;
     }
 
-
     @Bean
     @ConditionalOnMissingBean
-    public CustomCurrentLimiting getTool(@Qualifier(REDIS_SCRIPT_BEAN) RedisScript<List<Long>> script,
-                                         ReactiveRedisTemplate<String, String> redisTemplate,
+    public CustomCurrentLimiting getTool(@Qualifier(REDIS_SCRIPT_BEAN) RedisScript<Boolean> script,
+                                         StringRedisTemplate redisTemplate,
                                          CurrentLimitingService service,CurrentLimitingGlobalService globalService) {
         return new CustomCurrentLimiting(script, redisTemplate, service,globalService);
 

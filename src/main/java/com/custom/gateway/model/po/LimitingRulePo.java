@@ -26,9 +26,11 @@ public class LimitingRulePo {
 
     private Boolean ruleType;
 
-    private String ruleVals;
+    private String ruleVal;
 
     private Long qpsCount;
+
+    private String limitingHz;
 
     private Long limitingStartTime;
 
