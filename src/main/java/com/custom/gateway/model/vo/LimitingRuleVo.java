@@ -1,11 +1,12 @@
 package com.custom.gateway.model.vo;
 
+import com.custom.gateway.model.core.LimitingVo;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class LimitingRuleVo {
+public class LimitingRuleVo extends LimitingVo {
 
     private Long id;
 
@@ -18,10 +19,6 @@ public class LimitingRuleVo {
     private Long qpsCount;
 
     private String limitingHz;
-
-    private Long limitingStartTime;
-
-    private Long limitingEndTime;
 
     private Boolean isDel;
 

@@ -23,6 +23,11 @@ public class ResponseBodyEntity<T> {
         this.message = httpStatus.getReasonPhrase();
         this.success = success;
     }
+    public ResponseBodyEntity(HttpStatus httpStatus,String message, Boolean success) {
+        this.code = httpStatus.value();
+        this.message = message;
+        this.success = success;
+    }
 
     public ResponseBodyEntity(Exception e) {
         this.code = HttpStatus.BAD_REQUEST.value();

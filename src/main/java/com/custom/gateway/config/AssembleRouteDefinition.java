@@ -74,5 +74,26 @@ public class AssembleRouteDefinition {
         BeanUtils.copyProperties(instance, instanceVo);
         return instanceVo;
     };
+    public static Boolean isAllowed(LimitingRuleGlobalPo mono) {
+        if (mono != null) { //判断是否有自定义限流
+            if (mono.getLimitingStartTime() == -1
+                    && mono.getLimitingEndTime() == -1) //判断是否有开启关闭时间
+            {
+                return true;
+            } else if (mono.getLimitingStartTime() <= System.currentTimeMillis()
+                    && mono.getLimitingEndTime() >= System.currentTimeMillis()) //判断当前时间是否在限制时间内
+            {
+                return true;
 
+            } else if (mono.getLimitingStartTime() <= System.currentTimeMillis()
+                    && mono.getLimitingEndTime() == -1) //判断是否只有开启时间 没有关闭时间
+            {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

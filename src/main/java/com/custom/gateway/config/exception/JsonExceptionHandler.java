@@ -88,25 +88,23 @@ public class JsonExceptionHandler implements ErrorWebExceptionHandler {
         String body;
         ResponseBodyEntity error;
         ResponseStatusException responseStatusException;
+
         if (ex instanceof NotFoundException) {
             responseStatusException = (NotFoundException) ex;
-            error = new ResponseBodyEntity<String>(responseStatusException.getStatus(), false);
-            body = JSONArray.toJSONString(error);
         } else if (ex instanceof ResponseStatusException) {
             responseStatusException = (ResponseStatusException) ex;
-            error = new ResponseBodyEntity<String>(responseStatusException.getStatus(), false);
-            body = JSONArray.toJSONString(error);
         } else {
             responseStatusException = (ServerErrorException) ex;
-            error = new ResponseBodyEntity<String>(responseStatusException.getStatus(), false);
-            body = JSONArray.toJSONString(error);
         }
 
+        error = new ResponseBodyEntity<String>(responseStatusException.getStatus(), ex.getMessage(), false);
+        body = JSONArray.toJSONString(error);
         Map<String, Object> result = new HashMap<>(2, 1);
         result.put("httpStatus", responseStatusException.getStatus());
         result.put("body", body);
         ServerHttpRequest request = exchange.getRequest();
-        log.error("[全局异常处理]异常请求路径:{},记录异常信息:{}", request.getPath(), ex.getMessage());
+
+        log.error("Global request path:{},errorMessage:{}", request.getPath(), ex.getMessage());
         if (exchange.getResponse().isCommitted()) {
             return Mono.error(ex);
         }

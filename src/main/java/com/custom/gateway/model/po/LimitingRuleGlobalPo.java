@@ -24,6 +24,8 @@ public class LimitingRuleGlobalPo {
 
     private String ruleName;
 
+    private Boolean limitingType;
+
     private Long qpsCount;
 
     private String limitingHz;

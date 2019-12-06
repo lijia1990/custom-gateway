@@ -2,7 +2,7 @@ package com.custom.gateway.config.filter;
 
 import com.custom.gateway.config.CustomCurrentLimiting;
 import com.custom.gateway.config.InitCustomBeanConfig;
-import com.custom.gateway.model.core.AllowedEntity;
+import com.custom.gateway.config.exception.TooManyRequestsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -37,8 +37,7 @@ public class GlobalCurrentLimitingFilter implements WebFilter, Ordered {
 
     public static Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain, Boolean data) {
         if (data != null && !data) {
-            exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
-            return exchange.getResponse().setComplete();
+            throw new TooManyRequestsException(HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase());
         }
         return chain.filter(exchange);
     }

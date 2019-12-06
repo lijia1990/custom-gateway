@@ -6,11 +6,9 @@ import com.custom.gateway.config.annotation.CacheClean;
 import com.custom.gateway.dao.CustomCurrentLimitingGlobalMapper;
 import com.custom.gateway.model.form.LimitingRuleGlobalQueryForm;
 import com.custom.gateway.model.po.LimitingRuleGlobalPo;
-import com.custom.gateway.model.po.LimitingRulePo;
 import com.custom.gateway.model.vo.LimitingRuleGlobalVo;
 import com.custom.gateway.service.CurrentLimitingGlobalService;
 import com.github.pagehelper.PageHelper;
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,17 +18,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.custom.gateway.config.AssembleRouteDefinition.instanceGlobalInfoToCustomRouteVOFunc;
-import static com.custom.gateway.config.AssembleRouteDefinition.instanceInfoToCustomRouteVOFunc;
+import static com.custom.gateway.config.AssembleRouteDefinition.isAllowed;
 
 @Service
 @CacheConfig(cacheNames = "currentLimitingGlobal")
 @Transactional(rollbackFor = RuntimeException.class)
-@Import(AssembleRouteDefinition.class)
+@Import({AssembleRouteDefinition.class})
 public class CurrentLimitingGlobalServiceImpl implements CurrentLimitingGlobalService {
     @Autowired
     private CustomCurrentLimitingGlobalMapper dao;
@@ -68,18 +67,19 @@ public class CurrentLimitingGlobalServiceImpl implements CurrentLimitingGlobalSe
 
     @Override
     @Cacheable(value = "currentLimitingGlobalList")
-    public Mono<LimitingRuleGlobalVo> queryForGlobal() {
-        PageHelper.startPage(0, 1);
+    public Mono<Map> queryForGlobal() {
+        PageHelper.startPage(0, 2).setOrderBy("limiting_type");
         List<LimitingRuleGlobalPo> list = dao.selectList(new QueryWrapper<LimitingRuleGlobalPo>().eq("is_del", 0));
         if (list.isEmpty()) {
             return Mono.empty();
         }
-        return Mono.just(list.stream().map(instanceGlobalInfoToCustomRouteVOFunc).collect(Collectors.toList()).get(0));
+        return Mono.just(list.stream().filter(limitingRuleGlobalPo -> isAllowed(limitingRuleGlobalPo))
+                .map(instanceGlobalInfoToCustomRouteVOFunc).collect(Collectors.toList()).stream()
+                .collect(Collectors.toMap(LimitingRuleGlobalVo::getLimitingType,v->v)));
     }
 
     @Override
     @CacheEvict(value = "currentLimitingGlobalList", allEntries = true)
-
     public void clean() {
 
     }

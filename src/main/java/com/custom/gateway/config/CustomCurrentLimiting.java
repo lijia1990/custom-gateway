@@ -1,5 +1,7 @@
 package com.custom.gateway.config;
 
+import com.custom.gateway.model.core.LimitingVo;
+import com.custom.gateway.model.po.LimitingRuleGlobalPo;
 import com.custom.gateway.model.vo.LimitingRuleGlobalVo;
 import com.custom.gateway.model.vo.LimitingRuleVo;
 import com.custom.gateway.service.CurrentLimitingGlobalService;
@@ -12,11 +14,14 @@ import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 public class CustomCurrentLimiting {
 
     private RedisScript<Boolean> script;
+
+    private RedisScript<Boolean> globalScript;
 
     private CurrentLimitingService service;
 
@@ -24,9 +29,10 @@ public class CustomCurrentLimiting {
 
     private StringRedisTemplate stringRedisTemplate;
 
-    public CustomCurrentLimiting(RedisScript<Boolean> script, StringRedisTemplate redisTemplate, CurrentLimitingService service
+    public CustomCurrentLimiting(RedisScript<Boolean> script, RedisScript<Boolean> globalScript, StringRedisTemplate redisTemplate, CurrentLimitingService service
             , CurrentLimitingGlobalService globalService) {
         this.script = script;
+        this.globalScript = globalScript;
         this.stringRedisTemplate = redisTemplate;
         this.service = service;
         this.globalService = globalService;
@@ -49,13 +55,23 @@ public class CustomCurrentLimiting {
         if (isAllowed(voMonoIp) || isAllowed(voMonoPath)) { //判断是否有自定义限流
             return isAllowed(voMonoIp.block(), voMonoPath.block());
         } else {  //判断是否有全局限流
-            Mono<LimitingRuleGlobalVo> globalRule = globalService.queryForGlobal();
+            Mono<Map> globalRule = globalService.queryForGlobal();
+            return isAllowed(globalRule.block(), ip, path);
         }
-        return Mono.empty();
+    }
+
+    public Mono<Boolean> isAllowed(Map ruleGlobal, String ip, String path) {
+        log.info("All-restricted flow parameter splicing-------");
+        if (ruleGlobal != null && ruleGlobal.size() > 0) {
+
+            return Mono.just(false);
+        } else {
+            return Mono.just(true);
+        }
     }
 
     public Mono<Boolean> isAllowed(LimitingRuleVo ipRule, LimitingRuleVo pathRule) {
-        log.info("自定义限流参数拼接-------");
+        log.info("Custom current limiting parameter splicing------");
         if (ipRule != null) {
             List<String> keys = Arrays.asList(ipRule.getRuleVal(), null);
             return isAllowed(keys, ipRule.getQpsCount().toString(), null, ipRule.getLimitingHz());
@@ -65,7 +81,7 @@ public class CustomCurrentLimiting {
         }
     }
 
-    private Boolean isAllowed(Mono<LimitingRuleVo> monoVo) {
+    private Boolean isAllowed(Mono<? extends LimitingVo> monoVo) {
         if (monoVo.block() != null) { //判断是否有自定义限流
             if (monoVo.block().getLimitingStartTime() == -1
                     && monoVo.block().getLimitingEndTime() == -1) //判断是否有开启关闭时间
@@ -89,7 +105,7 @@ public class CustomCurrentLimiting {
     }
 
     private Mono<Boolean> isAllowed(List<String> keys, String... vals) {
-        log.info("进入自定义限流 LUA校验-----------------");
+        log.info("Enter custom current limiting LUA check-----------------");
         return Mono.just(this.stringRedisTemplate.execute(this.script, keys,
                 vals));
     }

@@ -21,15 +21,15 @@ public class CustomLoadBalance extends AbstractLoadBalancerRule {
     public Server choose(Object key) {
         List<Server> servers = this.getLoadBalancer().getReachableServers();
         if (servers.isEmpty()) {
-            log.error("The url is empty ! request ip is : {}",ReactiveRequestContextHolder.getIp());
+            log.error("The available service is empty ! request ip is : {}", ReactiveRequestContextHolder.getIp());
             return null;
         }
         Server server = servers.get(0);
         String ip = ReactiveRequestContextHolder.getIp();
         if (StringUtils.isNotBlank(ip)) {
             List<Server> serverList = servers.stream().filter(ser -> ser.getHost().equals(ip)).collect(Collectors.toList());
-            if (!serverList.isEmpty()){
-                server=serverList.get(0);
+            if (!serverList.isEmpty()) {
+                server = serverList.get(0);
             }
         }
         ReactiveRequestContextHolder.clean();
