@@ -16,7 +16,7 @@ spring:
   cache:
     type: caffeine
     caffeine:
-      spec: initialCapacity=10,maximumSize=2000,expireAfterWrite=600s
+      spec: initialCapacity=10,maximumSize=2000,expireAfterWrite=6s
 server:
   port: 1012
 
@@ -28,7 +28,6 @@ eureka:
     prefer-ip-address: true
     lease-expiration-duration-in-seconds: 10
     lease-renewal-interval-in-seconds: 5
-
 feign:
   httpclient:
     enabled: true

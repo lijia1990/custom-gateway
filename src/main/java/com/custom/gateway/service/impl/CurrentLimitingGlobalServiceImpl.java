@@ -67,7 +67,7 @@ public class CurrentLimitingGlobalServiceImpl implements CurrentLimitingGlobalSe
 
     @Override
     @Cacheable(value = "currentLimitingGlobalList")
-    public Mono<Map> queryForGlobal() {
+    public Mono<Map<Boolean,LimitingRuleGlobalVo>> queryForGlobal() {
         PageHelper.startPage(0, 2).setOrderBy("limiting_type");
         List<LimitingRuleGlobalPo> list = dao.selectList(new QueryWrapper<LimitingRuleGlobalPo>().eq("is_del", 0));
         if (list.isEmpty()) {

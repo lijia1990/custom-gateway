@@ -20,7 +20,7 @@ public interface CurrentLimitingGlobalService {
 
     List<LimitingRuleGlobalVo> queryList(LimitingRuleGlobalQueryForm from);
 
-    Mono<Map> queryForGlobal();
+    Mono<Map<Boolean,LimitingRuleGlobalVo>>  queryForGlobal();
 
     void clean();
 }

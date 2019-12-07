@@ -1,7 +1,6 @@
 package com.custom.gateway.config;
 
 import com.custom.gateway.model.core.LimitingVo;
-import com.custom.gateway.model.po.LimitingRuleGlobalPo;
 import com.custom.gateway.model.vo.LimitingRuleGlobalVo;
 import com.custom.gateway.model.vo.LimitingRuleVo;
 import com.custom.gateway.service.CurrentLimitingGlobalService;
@@ -41,8 +40,8 @@ public class CustomCurrentLimiting {
 
     public Mono<Boolean> isAllowed(ServerHttpRequest request) {
         if (request == null) {
-            log.error("request is null!");
-            return null;
+            log.error("----request is null!----");
+            return Mono.error(new NullPointerException("request is null"));
         }
         return isAllowed(request.getRemoteAddress().getHostString(), request.getPath().toString());
     }
@@ -55,23 +54,29 @@ public class CustomCurrentLimiting {
         if (isAllowed(voMonoIp) || isAllowed(voMonoPath)) { //判断是否有自定义限流
             return isAllowed(voMonoIp.block(), voMonoPath.block());
         } else {  //判断是否有全局限流
-            Mono<Map> globalRule = globalService.queryForGlobal();
+            Mono<Map<Boolean, LimitingRuleGlobalVo>> globalRule = globalService.queryForGlobal();
             return isAllowed(globalRule.block(), ip, path);
         }
     }
 
-    public Mono<Boolean> isAllowed(Map ruleGlobal, String ip, String path) {
-        log.info("All-restricted flow parameter splicing-------");
+    public Mono<Boolean> isAllowed(Map<Boolean, LimitingRuleGlobalVo> ruleGlobal, String ip, String path) {
+        log.info("-----All-restricted flow parameter splicing------");
         if (ruleGlobal != null && ruleGlobal.size() > 0) {
-
-            return Mono.just(false);
+            List<String> keys = Arrays.asList(ip, path);
+            LimitingRuleGlobalVo ipRule = ruleGlobal.get(false);
+            LimitingRuleGlobalVo reqRule = ruleGlobal.get(true);
+            return isAllowedGlobal(keys,
+                    ipRule == null ? "-1" : ipRule.getQpsCount().toString(),
+                    reqRule == null ?  "-1" : reqRule.getQpsCount().toString(),
+                    ipRule == null ? "1" : ipRule.getLimitingHz(),
+                    reqRule == null ? "1" : reqRule.getLimitingHz());
         } else {
             return Mono.just(true);
         }
     }
 
     public Mono<Boolean> isAllowed(LimitingRuleVo ipRule, LimitingRuleVo pathRule) {
-        log.info("Custom current limiting parameter splicing------");
+        log.info("-----Custom current limiting parameter splicing------");
         if (ipRule != null) {
             List<String> keys = Arrays.asList(ipRule.getRuleVal(), null);
             return isAllowed(keys, ipRule.getQpsCount().toString(), null, ipRule.getLimitingHz());
@@ -105,8 +110,14 @@ public class CustomCurrentLimiting {
     }
 
     private Mono<Boolean> isAllowed(List<String> keys, String... vals) {
-        log.info("Enter custom current limiting LUA check-----------------");
+        log.info("-----Enter custom current limiting LUA check-----");
         return Mono.just(this.stringRedisTemplate.execute(this.script, keys,
+                vals));
+    }
+
+    private Mono<Boolean> isAllowedGlobal(List<String> keys, String... vals) {
+        log.info("-----Enter custom current limiting LUA check----");
+        return Mono.just(this.stringRedisTemplate.execute(this.globalScript, keys,
                 vals));
     }
 

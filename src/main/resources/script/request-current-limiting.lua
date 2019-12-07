@@ -8,7 +8,7 @@ local expire_time = tonumber(ARGV[3])
 
 
 
-if limit_ip_count > 0 and key1  then
+if limit_ip_count >= 0 and key1  then
     local real_ip_count = tonumber(redis.call("get", key1))
     if real_ip_count and  real_ip_count >= limit_ip_count then
 	     return false
@@ -19,7 +19,7 @@ if limit_ip_count > 0 and key1  then
     end
 end
 
-if limit_req_count > 0  and key2  then
+if limit_req_count >= 0  and key2  then
   local real_req_count =  tonumber(redis.call("get", key2))
     if real_req_count and  real_req_count >= limit_req_count then
      return false
