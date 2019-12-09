@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
@@ -16,27 +15,25 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import static com.custom.gateway.config.CustomLimitingBeanConfig.CURRENT_NAME;
+import static com.custom.gateway.config.CustomLimitingBeanConfig.CURRENT_SERVER_NAME;
 
 
 @Configuration
 @AutoConfigureAfter(CustomLimitingBeanConfig.class)
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
-@ConditionalOnProperty(prefix = "limiting", name = "enable", havingValue = "true")
-public class GlobalCurrentLimitingFilter implements WebFilter, Ordered {
+@ConditionalOnProperty(prefix = "routeCache", name = "server", havingValue = "true")
+public class ServerCurrentLimitingFilter implements WebFilter, Ordered {
     @Autowired
-    @Qualifier(CURRENT_NAME)
-    private CustomLimiting customCurrentLimiting;
+    @Qualifier(CURRENT_SERVER_NAME)
+    private CustomLimiting customServer;
 
     @Override
     public int getOrder() {
-        return -1;
+        return -2;
     }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return customCurrentLimiting.isAllowed(exchange.getRequest()).flatMap(data -> filter(exchange, chain, data)
-        );
+        return chain.filter(exchange);
     }
 
     public static Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain, Boolean data) {

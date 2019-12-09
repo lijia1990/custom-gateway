@@ -4,9 +4,11 @@ import com.custom.gateway.config.redis.CustomRedisGlobalScript;
 import com.custom.gateway.config.redis.CustomRedisScript;
 import com.custom.gateway.service.CurrentLimitingGlobalService;
 import com.custom.gateway.service.CurrentLimitingService;
+import com.custom.gateway.service.RouteService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,9 +19,11 @@ import org.springframework.scripting.support.ResourceScriptSource;
 
 @Configuration
 @AutoConfigureAfter(RedisReactiveAutoConfiguration.class)
-public class InitCustomBeanConfig {
+public class CustomLimitingBeanConfig {
     public static final String REDIS_SCRIPT_BEAN = "customRedisScript";
     public static final String REDIS_SCRIPT_GLOBAL_BEAN = "globalCustomRedisScript";
+    public static final String CURRENT_NAME = "current";
+    public static final String CURRENT_SERVER_NAME = "serverLimit";
 
     @Bean(REDIS_SCRIPT_BEAN)
     public CustomRedisScript redisRequestRateLimiterScript() {
@@ -39,13 +43,24 @@ public class InitCustomBeanConfig {
         return redisScript;
     }
 
-    @Bean
+    @Bean(CURRENT_NAME)
     @ConditionalOnMissingBean
-    public CustomCurrentLimiting getTool(@Qualifier(REDIS_SCRIPT_BEAN) RedisScript<Boolean> script,
+    public CustomLimiting getTool(@Qualifier(REDIS_SCRIPT_BEAN) RedisScript<Boolean> script,
                                          @Qualifier(REDIS_SCRIPT_GLOBAL_BEAN) RedisScript<Boolean> globalScript,
                                          StringRedisTemplate redisTemplate,
                                          CurrentLimitingService service, CurrentLimitingGlobalService globalService) {
         return new CustomCurrentLimiting(script, globalScript, redisTemplate, service, globalService);
 
     }
+
+    @Bean(CURRENT_SERVER_NAME)
+    @ConditionalOnProperty(prefix = "routeCache", name = "server", havingValue = "true")
+    public CustomLimiting getServerTool(
+            @Qualifier(REDIS_SCRIPT_BEAN) RedisScript<Boolean> script,
+            StringRedisTemplate redisTemplate,
+            RouteService routeService) {
+        return new CustomServerLimiting(routeService, script, redisTemplate);
+
+    }
+
 }

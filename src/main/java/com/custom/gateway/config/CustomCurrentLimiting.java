@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Log4j2
-public class CustomCurrentLimiting {
+public class CustomCurrentLimiting implements CustomLimiting {
 
     private RedisScript<Boolean> script;
 
@@ -38,6 +38,7 @@ public class CustomCurrentLimiting {
 
     }
 
+    @Override
     public Mono<Boolean> isAllowed(ServerHttpRequest request) {
         if (request == null) {
             log.error("----request is null!----");
@@ -67,7 +68,7 @@ public class CustomCurrentLimiting {
             LimitingRuleGlobalVo reqRule = ruleGlobal.get(true);
             return isAllowedGlobal(keys,
                     ipRule == null ? "-1" : ipRule.getQpsCount().toString(),
-                    reqRule == null ?  "-1" : reqRule.getQpsCount().toString(),
+                    reqRule == null ? "-1" : reqRule.getQpsCount().toString(),
                     ipRule == null ? "1" : ipRule.getLimitingHz(),
                     reqRule == null ? "1" : reqRule.getLimitingHz());
         } else {
