@@ -31,30 +31,31 @@ import static com.custom.gateway.config.AssembleRouteDefinition.isAllowed;
 @Transactional(rollbackFor = RuntimeException.class)
 @Import({AssembleRouteDefinition.class})
 public class CurrentLimitingGlobalServiceImpl implements CurrentLimitingGlobalService {
+    private static final String CACHE_KEY="currentLimitingGlobal";
     @Autowired
     private CustomCurrentLimitingGlobalMapper dao;
 
 
     @Override
-    @CacheClean("currentLimitingGlobal")
+    @CacheClean(CACHE_KEY)
     public void save(LimitingRuleGlobalPo po) {
         dao.insert(po);
     }
 
     @Override
-    @CacheClean("currentLimitingGlobal")
+    @CacheClean(CACHE_KEY)
     public void delete(Long id) {
         dao.updateById(new LimitingRuleGlobalPo(id, true));
     }
 
     @Override
-    @CacheClean("currentLimitingGlobal")
+    @CacheClean(CACHE_KEY)
     public void update(LimitingRuleGlobalPo po) {
         dao.updateById(po);
     }
 
     @Override
-    @Cacheable(value = "currentLimitingGlobal", key = "#id")
+    @Cacheable(value = CACHE_KEY, key = "#id")
     public LimitingRuleGlobalPo findById(Long id) {
         return dao.selectById(id);
     }
@@ -66,7 +67,7 @@ public class CurrentLimitingGlobalServiceImpl implements CurrentLimitingGlobalSe
     }
 
     @Override
-    @Cacheable(value = "currentLimitingGlobalList")
+    @Cacheable(value = CACHE_KEY)
     public Mono<Map<Boolean,LimitingRuleGlobalVo>> queryForGlobal() {
         PageHelper.startPage(0, 2).setOrderBy("limiting_type");
         List<LimitingRuleGlobalPo> list = dao.selectList(new QueryWrapper<LimitingRuleGlobalPo>().eq("is_del", 0));
@@ -79,7 +80,7 @@ public class CurrentLimitingGlobalServiceImpl implements CurrentLimitingGlobalSe
     }
 
     @Override
-    @CacheEvict(value = "currentLimitingGlobalList", allEntries = true)
+    @CacheEvict(value = CACHE_KEY, allEntries = true)
     public void clean() {
 
     }

@@ -2,9 +2,9 @@
 local key1 = KEYS[1]    --ip名称
 local key2 = KEYS[2]    --接口路径
 
-local limit_ip_count = tonumber( ARGV[1])
+local limit_ip_count  = tonumber( ARGV[1])
 local limit_req_count = tonumber(ARGV[2])
-local ip_expire_time = tonumber(ARGV[3])
+local ip_expire_time  = tonumber(ARGV[3])
 local req_expire_time = tonumber(ARGV[4])
 
 

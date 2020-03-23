@@ -64,6 +64,7 @@ public class CustomCacheLoadBalanceHandler {
                 resultFlag = handle(server, value);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
+                return false;
             }
             if (!resultFlag) {
                 return resultFlag;

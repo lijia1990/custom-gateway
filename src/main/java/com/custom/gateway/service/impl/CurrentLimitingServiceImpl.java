@@ -29,29 +29,30 @@ import static com.custom.gateway.config.AssembleRouteDefinition.instanceInfoToCu
 @Transactional(rollbackFor = RuntimeException.class)
 @Import(AssembleRouteDefinition.class)
 public class CurrentLimitingServiceImpl implements CurrentLimitingService {
+    private static final String CURRENT_LIMITING="currentLimiting";
     @Autowired
     private CustomCurrentLimitingMapper dao;
 
     @Override
-    @CacheClean("currentLimiting")
+    @CacheClean(CURRENT_LIMITING)
     public void save(LimitingRulePo po) {
         dao.insert(po);
     }
 
     @Override
-    @CacheClean("currentLimiting")
+    @CacheClean(CURRENT_LIMITING)
     public void delete(Long id) {
         dao.updateById(new LimitingRulePo(id, true));
     }
 
     @Override
-    @CacheClean("currentLimiting")
+    @CacheClean(CURRENT_LIMITING)
     public void update(LimitingRulePo po) {
         dao.updateById(po);
     }
 
     @Override
-    @Cacheable(value = "currentLimiting", key = "#id")
+    @Cacheable(value = CURRENT_LIMITING, key = "#id")
     public LimitingRulePo findById(Long id) {
         return null;
     }
@@ -62,7 +63,7 @@ public class CurrentLimitingServiceImpl implements CurrentLimitingService {
     }
 
     @Override
-    @Cacheable(value = "currentLimiting", key = "#val")
+    @Cacheable(value = CURRENT_LIMITING, key = "#val")
     public Mono<LimitingRuleVo> queryForVal(String val) {
         PageHelper.startPage(0, 1);
         List<LimitingRulePo> list = dao.selectList(new QueryWrapper<LimitingRulePo>()

@@ -24,6 +24,7 @@ import static com.custom.gateway.config.CustomLimitingBeanConfig.CURRENT_NAME;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.REACTIVE)
 @ConditionalOnProperty(prefix = "limiting", name = "enable", havingValue = "true")
 public class GlobalCurrentLimitingFilter implements WebFilter, Ordered {
+
     @Autowired
     @Qualifier(CURRENT_NAME)
     private CustomLimiting customCurrentLimiting;

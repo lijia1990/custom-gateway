@@ -17,6 +17,7 @@ spring:
     type: caffeine
     caffeine:
       spec: initialCapacity=10,maximumSize=2000,expireAfterWrite=6s
+
 server:
   port: 1012
 
@@ -28,6 +29,12 @@ eureka:
     prefer-ip-address: true
     lease-expiration-duration-in-seconds: 10
     lease-renewal-interval-in-seconds: 5
+    health-check-url-path: /actuator/health
+    metadata-map:
+      user:
+        name: admin
+        password: admin
+
 feign:
   httpclient:
     enabled: true
@@ -38,21 +45,24 @@ management:
   endpoints:
     web:
       exposure:
-        include: 'service-registry'
+        include: "*"
+      base-path: /actuator
+
   endpoint:
     health:
       show-details: always
     shutdown:
-      enabled: false
+      enabled: true
   server:
     port: 1012
 mybatis-plus:
-  #信息输出设置
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
 nacos:
   config:
     server-addr: 127.0.0.1:8848
+
 routeCache:
   enable: true
   balance: true
@@ -61,8 +71,10 @@ limiting:
   enable: true
 
 pagehelper:
-  reasonable: false # 禁用合理化时，如果pageNum<1或pageNum>pages会返回空数据
+  reasonable: false
   support-methods-arguments: true
   params: count=countSql
   row-bounds-with-count: true
   helper-dialect: mysql
+
+
