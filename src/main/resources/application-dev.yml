@@ -40,6 +40,25 @@ feign:
     enabled: true
   hystrix:
     enabled: true
+ribbon:
+  ReadTimeout: 1000
+  ConnectTimeout: 1000
+  MaxAutoRetries: 1   #最大重试次数，当Eureka中可以找到服务，但是服务连不上时将会重试
+  MaxAutoRetriesNextServer: 1 #切换实例的重试次数
+  OkToRetryOnAllOperations: false #对所有的操作请求都进行重试，如果是get则可以，如果是post,put等操作没有实现幂等的情况下是很危险的，所以设置为false
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000 # (1 + MaxAutoRetries + MaxAutoRetriesNextServer) * ReadTimeout
+    serverMethod:
+          execution:
+            isolation:
+              thread:
+                timeoutInMilliseconds: 3000
 
 management:
   endpoints:
