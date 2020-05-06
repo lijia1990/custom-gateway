@@ -27,14 +27,6 @@ public class AssembleRouteDefinition {
         definition.setId(gwdefinition.getId());
         definition.setOrder(gwdefinition.getOrder());
         //设置断言
-//        List<PredicateDefinition> pdList = new ArrayList<>();
-//        List<GatewayPredicateDefinition> gatewayPredicateDefinitionList = gwdefinition.getPredicates();
-//        for (GatewayPredicateDefinition gpDefinition : gatewayPredicateDefinitionList) {
-//            PredicateDefinition predicate = new PredicateDefinition();
-//            predicate.setArgs(gpDefinition.getArgs());
-//            predicate.setName(gpDefinition.getName());
-//            pdList.add(predicate);
-//        }
         definition.setPredicates(gwdefinition.getPredicates().stream().map(pr -> {
             PredicateDefinition predicate = new PredicateDefinition();
             predicate.setArgs(pr.getArgs());
@@ -42,14 +34,6 @@ public class AssembleRouteDefinition {
             return predicate;
         }).collect(Collectors.toList()));
         //设置过滤器
-//        List<FilterDefinition> filters = new ArrayList();
-//        List<GatewayFilterDefinition> gatewayFilters = gwdefinition.getFilters();
-//        for (GatewayFilterDefinition filterDefinition : gatewayFilters) {
-//            FilterDefinition filter = new FilterDefinition();
-//            filter.setName(filterDefinition.getName());
-//            filter.setArgs(filterDefinition.getArgs());
-//            filters.add(filter);
-//        }
         definition.setFilters( gwdefinition.getFilters().stream().map(gatewayFilter->{
             FilterDefinition filter = new FilterDefinition();
             filter.setName(gatewayFilter.getName());
